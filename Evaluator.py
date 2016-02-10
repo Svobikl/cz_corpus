@@ -16,14 +16,17 @@ from fnmatch import fnmatch
 word2vecmodel_EN= '/media/data/korpusy/Trained/EN-vectors-cbow.txt'
 amazonWord2Vec = '/media/data/korpusy/Trained/Amazon-vectors-cbow.txt'
 word2vecmodel_CZ = [
-                    'F:\Workspace\\Korpusy\\models\\vectors_cz_dim50cbow3vocab1m.txt',
-                    'F:\Workspace\\Korpusy\\models\\vectors_cz_dim100cbow3vocab1m.txt',
-                    'F:\Workspace\\Korpusy\\models\\vectors_cz_dim300cbow3vocab1m.txt'
+                    '/media/data/korpusy/Trained/CZvec/vectors_cz_dim50cbow3vocab1m.txt',
+                    '/media/data/korpusy/Trained/CZvec/vectors_cz_dim100cbow3vocab1m.txt',
+                    '/media/data/korpusy/Trained/CZvec/vectors_cz_dim300cbow3vocab1m.txt',
+                    '/media/data/korpusy/Trained/CZvec/vectors_cz_dim500cbow3vocab1m.txt',
+                    '/media/data/korpusy/Trained/CZvec/vectors_cz_dim50skip3vocab1m.txt',
+                    '/media/data/korpusy/Trained/CZvec/vectors_cz_dim100skip3vocab1m.txt'
                     ]
 
 
 corpusPath_EN = '/home/svobik/Workspace/Python/Svobik_corpus/English(byMikolov)/questions-words.txt'
-corpusPath_CZ = 'F:\Skola\phd\Corpus\corpus\czech_emb_corpus.txt'
+corpusPath_CZ = '/home/svobik/Workspace/Python/Svobik_corpus/Czech/czech_emb_corpus.txt'
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
@@ -59,7 +62,7 @@ def evaluate_file(filePath, topN, outputFile):
     notSeenCounter = 0
     questionsCount =0
     fw = codecs.open(outputFile[:-4]+".res.txt", 'w','utf-8' )
-    prevCategory = "Nothing"
+    prevCategory = "Antonyms-nouns"
     fwerr = open(outputFile[:-4]+"err.log", 'w')
     with codecs.open(filePath, 'r','utf-8') as f:
         for line in f:
@@ -68,7 +71,7 @@ def evaluate_file(filePath, topN, outputFile):
                     currAcc= (accuracy/classItemsCount)*100.0
                     currAccCosMul= (accuracyCosMul/classItemsCount)*100.0
                     print(prevCategory)
-                    print "Accuracy TOP%d = %f (%d/%d)" % (topN,currAcc, accuracy,classItemsCount)
+                    print "Accuracy TOP%d = %f (%d/%d)\n" % (topN,currAcc, accuracy,classItemsCount)
                     fw.write(prevCategory.encode('utf-8'))
                     fw.write("Accuracy TOP%d = %f (%d/%d)" % (topN,currAcc, accuracy,classItemsCount))
                     prevCategory = line
@@ -78,7 +81,7 @@ def evaluate_file(filePath, topN, outputFile):
                 classItemsCount = 0
             else:
                 tokens = line.lower().strip().split(" ")
-                questionsCount += 1
+                questionsCount = questionsCount + 1
                 #print tokens[0]
                 classItemsCount = classItemsCount + 1
                 try:
@@ -107,17 +110,17 @@ def evaluate_file(filePath, topN, outputFile):
                 except KeyError,e:
                     logging.error(e)
                     notSeenCounter +=1
-                    fwerr.write(e)
+                    fwerr.write(str(e))
 
-        print "Total accuracy TOP%d = %d", (topN,(accuracyAll/questionsCount)*100.0)
-        fw.write("Total accuracy TOP%d = %d", (topN,(accuracyAll/questionsCount)*100.0))
-        print "Total accuracy CosMul TOP%d = %d", (topN,(accuracyAllCosMul/questionsCount)*100.0)
-        #fw.write("Total accuracy CosMul TOP%d = %d", (topN,(accuracyAllCosMul/questionsCount)*100.0))
-        print "Seen= %d",((questionsCount-notSeenCounter)/questionsCount * 100.0)
-        fw.write("Seen= %d",((questionsCount-notSeenCounter)/questionsCount * 100.0))
+    print "Total accuracy TOP%d = %d" % (topN,(accuracyAll/questionsCount)*100.0)
+    fw.write("Total accuracy TOP%d = %d" % (topN,(accuracyAll/questionsCount)*100.0))
+    print "Total accuracy CosMul TOP%d = %d" % (topN,(accuracyAllCosMul/questionsCount)*100.0)
+    #fw.write("Total accuracy CosMul TOP%d = %d", (topN,(accuracyAllCosMul/questionsCount)*100.0))
+    print "Seen= %f" % ((questionsCount-notSeenCounter)/questionsCount * 100.0)
+    fw.write("Seen= %f"% ((questionsCount-notSeenCounter)/questionsCount * 100.0))
 
-        fw.close()
-        fwerr.close()
+    fw.close()
+    fwerr.close()
 
     return 0
 
