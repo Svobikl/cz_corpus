@@ -16,18 +16,16 @@ from fnmatch import fnmatch
 word2vecmodel_EN= '/media/data/korpusy/Trained/EN-vectors-cbow.txt'
 amazonWord2Vec = '/media/data/korpusy/Trained/Amazon-vectors-cbow.txt'
 word2vecmodel_CZ = [
-                    '/media/data/korpusy/Trained/CZvec/vectors_cz_dim50cbow3vocab1m.txt',
-                    '/media/data/korpusy/Trained/CZvec/vectors_cz_dim100cbow3vocab1m.txt',
-                    '/media/data/korpusy/Trained/CZvec/vectors_cz_dim300cbow3vocab1m.txt',
-                    '/media/data/korpusy/Trained/CZvec/vectors_cz_dim500cbow3vocab1m.txt',
-                    '/media/data/korpusy/Trained/CZvec/vectors_cz_dim50skip3vocab1m.txt',
-                    '/media/data/korpusy/Trained/CZvec/vectors_cz_dim100skip3vocab1m.txt'
+                    '/media/svobikl/Data/Workspace/Korpusy/models/iter3/vectors_cz_dim100cbow3vocab1m.bin',
+
+
                     ]
 
 
 corpusPath_EN = '/home/svobik/Workspace/Python/Svobik_corpus/English(byMikolov)/questions-words.txt'
-corpusPath_CZ = '/home/svobik/Workspace/Python/Svobik_corpus/Czech/czech_emb_corpus.txt'
+corpusPath_CZ = './corpus/czech_emb_corpus.txt'
 
+NUM_SEMANTIC_CLASSES = 6
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 def cosine_vector_similarity(vec_a, vec_b):
@@ -61,63 +59,90 @@ def evaluate_file(filePath, topN, outputFile):
     classItemsCount = 0
     notSeenCounter = 0
     questionsCount =0
-    fw = codecs.open(outputFile[:-4]+".res.txt", 'w','utf-8' )
-    prevCategory = "Antonyms-nouns"
-    fwerr = open(outputFile[:-4]+"err.log", 'w')
+    classNumb = 0
+
+    listAccSemantic = []
+    listAccSynt= []
+    fw = codecs.open(outputFile[:-4]+".res"+str(topN)+".txt", 'w','utf-8' )
+    prevCategory = ": Antonyms-nouns"
+    fwerr = codecs.open(outputFile[:-4]+"err.log", 'w', 'utf-8')
+
+    listErr= []
     with codecs.open(filePath, 'r','utf-8') as f:
         for line in f:
             if (line.strip()[0]==':'):
+
                 if classItemsCount!=0:
+
                     currAcc= (accuracy/classItemsCount)*100.0
                     currAccCosMul= (accuracyCosMul/classItemsCount)*100.0
-                    print(prevCategory)
-                    print "Accuracy TOP%d = %f (%d/%d)\n" % (topN,currAcc, accuracy,classItemsCount)
-                    fw.write(prevCategory.encode('utf-8'))
-                    fw.write("Accuracy TOP%d = %f (%d/%d)" % (topN,currAcc, accuracy,classItemsCount))
+                    if classNumb< NUM_SEMANTIC_CLASSES:
+                        listAccSemantic.append(currAcc)
+                    else :
+                        listAccSynt.append(currAcc)
+                    print(prevCategory + " > accuracy TOP%d = %f (%d/%d)\n" % (topN,currAcc, accuracy,classItemsCount))
+                    fw.write(prevCategory.encode('utf-8') + " > accuracy TOP%d = %f (%d/%d) \n" % (topN,currAcc, accuracy,classItemsCount))
                     prevCategory = line
+                    classNumb = classNumb + 1
+
                 print line
                 accuracy = 0.0
                 accuracyCosMul = 0.0
                 classItemsCount = 0
             else:
                 tokens = line.lower().strip().split(" ")
-                questionsCount = questionsCount + 1
-                #print tokens[0]
-                classItemsCount = classItemsCount + 1
+                questionsCount = questionsCount + 1.0
+                classItemsCount = classItemsCount + 1.0
                 try:
 
-                    #list = model.most_similar(positive=[tokens[0], tokens[2]], negative=[tokens[1]], topn=topN)
                     list = most_similar_to_vec(result_vector(tokens[0], tokens[1], tokens[2], model),model,topN,tokens[:-1])
                     for item in list:
-                        #print item[0]
-                        #print "Pos=%s,Neg=%s,item found=%s", (tokens[0]+","+tokens[2], tokens[1], str(item[0]))
                         match = item[0]
                         #match = match.encode('utf-8')
                         if match == tokens[3]:
                             #print "Correct item=%s" % (item[0])
                             accuracy =accuracy + 1.0
                             accuracyAll =accuracyAll + 1.0
-                    #list = model.most_similar_cosmul(positive=[tokens[0], tokens[2]], negative=[tokens[1]], topn=topN)
-                    #for item in list:
-                        #print item[0]
-                        #print "Pos=%s,Neg=%s,item found=%s", (tokens[0]+","+tokens[2], tokens[1], str(item[0]))
-                    #    match = item[0]
-                    #    match = match.encode('utf-8')
-                    #    if match in tokens[3]:
-                    #        print "Correct cosmul item=%s" % (item[0])
-                    #        accuracyCosMul =accuracyCosMul + 1.0
-                    #        accuracyAllCosMul =accuracyAllCosMul + 1.0
+
                 except KeyError,e:
                     logging.error(e)
-                    notSeenCounter +=1
-                    fwerr.write(str(e))
+                    wordErr = str(e).encode("utf-8")
+                    notSeenCounter = notSeenCounter + 1.0
+                    listErr.append(e)
 
-    print "Total accuracy TOP%d = %d" % (topN,(accuracyAll/questionsCount)*100.0)
-    fw.write("Total accuracy TOP%d = %d" % (topN,(accuracyAll/questionsCount)*100.0))
-    print "Total accuracy CosMul TOP%d = %d" % (topN,(accuracyAllCosMul/questionsCount)*100.0)
+    if classItemsCount!=0:
+        currAcc= (accuracy/classItemsCount)*100.0
+        currAccCosMul= (accuracyCosMul/classItemsCount)*100.0
+        listAccSynt.append(currAcc)
+        print(prevCategory + " > accuracy TOP%d = %f (%d/%d)\n" % (topN,currAcc, accuracy,classItemsCount))
+        fw.write(prevCategory.encode('utf-8') + " > accuracy TOP%d = %f (%d/%d)\n" % (topN,currAcc, accuracy,classItemsCount))
+
+    avgVal = 0.0
+    count= 0.0
+    for val in listAccSemantic:
+        avgVal = avgVal +val
+        count = count + 1.0
+    semanticAcc = avgVal / count
+
+    avgVal = 0.0
+    count= 0.0
+    for val in listAccSynt:
+        avgVal = avgVal +val
+        count = count + 1.0
+    syntacticAcc = avgVal / count
+
+
+    print "Total accuracy TOP%d = %f \n" % (topN,(accuracyAll/questionsCount)*100.0)
+    fw.write("Total accuracy TOP%d = %f \n" % (topN,(accuracyAll/questionsCount)*100.0))
+    fw.write("Semantic accuracy TOP%d = %f \n" % (topN,semanticAcc))
+    fw.write("Syntactic accuracy TOP%d = %f \n" % (topN,syntacticAcc))
+    #print "Total accuracy CosMul TOP%d = %f" % (topN,(accuracyAllCosMul/questionsCount)*100.0)
     #fw.write("Total accuracy CosMul TOP%d = %d", (topN,(accuracyAllCosMul/questionsCount)*100.0))
-    print "Seen= %f" % ((questionsCount-notSeenCounter)/questionsCount * 100.0)
-    fw.write("Seen= %f"% ((questionsCount-notSeenCounter)/questionsCount * 100.0))
+    print "Seen= %f" % (((questionsCount-notSeenCounter)/questionsCount) * 100.0)
+    fw.write("Seen= %f"% (((questionsCount-notSeenCounter)/questionsCount) * 100.0))
+
+    for word in np.unique(listErr):
+        fwerr.write(str(word)+"\n")
 
     fw.close()
     fwerr.close()
@@ -135,8 +160,10 @@ if __name__ == '__main__':
     options, args = parser.parse_args()
 
     for name in word2vecmodel_CZ:
-        model = Word2Vec.load_word2vec_format(name,binary=False)
+        model = Word2Vec.load_word2vec_format(name,binary=True)
         evaluate_file(corpusPath_CZ,1, name)
+        evaluate_file(corpusPath_CZ,5, name)
+        evaluate_file(corpusPath_CZ,10, name)
     #readfile(corpusPath_CZ)
 
 
