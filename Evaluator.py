@@ -16,8 +16,7 @@ from fnmatch import fnmatch
 word2vecmodel_EN= '/media/data/korpusy/Trained/EN-vectors-cbow.txt'
 amazonWord2Vec = '/media/data/korpusy/Trained/Amazon-vectors-cbow.txt'
 word2vecmodel_CZ = [
-                    '/media/svobikl/Data/Workspace/Korpusy/models/iter3/vectors_cz_dim100cbow3vocab1m.bin',
-
+                    '/media/svobikl/Data/Workspace/Korpusy/models/cz_cbow300_1mil_10.txt',
 
                     ]
 
@@ -45,7 +44,7 @@ def result_vector(st1,st2,st3, model):
 def most_similar_to_vec(vector,model,topn, list_words):
     dists = np.dot(model.syn0norm, vector)
 
-    best = matutils.argsort(dists, topn=topn + len(list_words), reverse=True)
+    best = matutils.argsort(dists, topn=topn + len(list_words), reverse=False)
     # ignore (don't return) words from the input
     result = [(model.index2word[sim], float(dists[sim])) for sim in best if model.index2word[sim] not in list_words]
 
@@ -68,8 +67,10 @@ def evaluate_file(filePath, topN, outputFile):
     fwerr = codecs.open(outputFile[:-4]+"err.log", 'w', 'utf-8')
 
     listErr= []
+
     with codecs.open(filePath, 'r','utf-8') as f:
         for line in f:
+
             if (line.strip()[0]==':'):
 
                 if classItemsCount!=0:
@@ -98,6 +99,7 @@ def evaluate_file(filePath, topN, outputFile):
                     list = most_similar_to_vec(result_vector(tokens[0], tokens[1], tokens[2], model),model,topN,tokens[:-1])
                     for item in list:
                         match = item[0]
+
                         #match = match.encode('utf-8')
                         if match == tokens[3]:
                             #print "Correct item=%s" % (item[0])
@@ -154,13 +156,13 @@ if __name__ == '__main__':
 
     parser = optparse.OptionParser(usage="%prog [OPTIONS]")
     parser.add_option('-m', '--model', default='vector.txt',
-                      help='Give a path with the name of a model to load (default name= vector.txt)')
+                      help='Give a path with the name of a model to load (default name= ./models/vector.txt)')
     parser.add_option('-c', '--corpus', default='cz_emb.txt',
-                      help='Give a name of corpus to analyze  (default: cz_emb.txt)')
+                      help='Give a name of corpus to analyze  (default: ./corpus/czech_emb_corpus.txt)')
     options, args = parser.parse_args()
 
     for name in word2vecmodel_CZ:
-        model = Word2Vec.load_word2vec_format(name,binary=True)
+        model = Word2Vec.load_word2vec_format(name,binary=False)
         evaluate_file(corpusPath_CZ,1, name)
         evaluate_file(corpusPath_CZ,5, name)
         evaluate_file(corpusPath_CZ,10, name)
