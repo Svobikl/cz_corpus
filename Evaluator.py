@@ -13,17 +13,6 @@ import codecs
 from fnmatch import fnmatch
 
 
-word2vecmodel_EN= '/media/data/korpusy/Trained/EN-vectors-cbow.txt'
-amazonWord2Vec = '/media/data/korpusy/Trained/Amazon-vectors-cbow.txt'
-word2vecmodel_CZ = [
-                    '/media/svobikl/Data/Workspace/Korpusy/models/cz_cbow300_1mil_10.txt',
-
-                    ]
-
-
-corpusPath_EN = '/home/svobik/Workspace/Python/Svobik_corpus/English(byMikolov)/questions-words.txt'
-corpusPath_CZ = './corpus/czech_emb_corpus.txt'
-
 NUM_SEMANTIC_CLASSES = 6
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
@@ -156,17 +145,17 @@ if __name__ == '__main__':
 
     parser = optparse.OptionParser(usage="%prog [OPTIONS]")
     parser.add_option('-m', '--model', default='vector.txt',
-                      help='Give a path with the name of a model to load (default name= ./models/vector.txt)')
-    parser.add_option('-c', '--corpus', default='cz_emb.txt',
+
+                      help='Give a path with the name of a model to load (default name= vector.txt)')
+    parser.add_option('-c', '--corpus', default='./corpus/czech_emb_corpus.txt',
                       help='Give a name of corpus to analyze  (default: ./corpus/czech_emb_corpus.txt)')
+    parser.add_option('-t', '--topn', default='1',
+                      help='TOP N similar words')
     options, args = parser.parse_args()
 
-    for name in word2vecmodel_CZ:
-        model = Word2Vec.load_word2vec_format(name,binary=False)
-        evaluate_file(corpusPath_CZ,1, name)
-        evaluate_file(corpusPath_CZ,5, name)
-        evaluate_file(corpusPath_CZ,10, name)
-    #readfile(corpusPath_CZ)
+    model = Word2Vec.load_word2vec_format(options.model,binary=False)
+    evaluate_file(options.corpus,options.topn, options.model)
+
 
 
 
