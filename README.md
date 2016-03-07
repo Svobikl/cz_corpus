@@ -20,7 +20,11 @@ Running evaluator:
  - "python Evaluator.py -m ./models/no_phrase/vectors_cz_cbow_dim300uni400_w15n15_iter15.txt"
 
 
-- or you can use help command and see how to specify your own model
+Settings: 
+- "-m" : model path specification
+- "-t" : top n similar words,  default is 1.
+- "-c" : corpus path specification, default is "./corpus/czech_emb_corpus.txt",
+- or you can use "help" command and see all possible argument settings.
 
 
 
