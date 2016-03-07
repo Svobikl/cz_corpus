@@ -9,7 +9,9 @@ Prerequisites:
 Clone repository and uncompress model: 
 
  - "git clone https://github.com/Svobikl/cz_corpus Evaluator"
-
+ - Download model from following address: "https://github.com/Svobikl/cz_corpus/releases/tag/release1.0/vectors_cz_cbow_dim300uni400_w15n15_iter15.txt.tar.gz" and save it to
+folder "models/no_phrase"
+ - Alternatively you can download other models from "https://github.com/Svobikl/cz_corpus/releases/tag/release1.0" 
  - "tar -zxvf Evaluator/models/no_phrase/vectors_cz_cbow_dim300uni400_w15n15_iter15.tar.gz"
 
 Running evaluator:
