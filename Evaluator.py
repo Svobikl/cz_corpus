@@ -33,7 +33,7 @@ def result_vector(st1,st2,st3, model):
 def most_similar_to_vec(vector,model,topn, list_words):
     dists = np.dot(model.syn0norm, vector)
 
-    best = matutils.argsort(dists, topn=topn + len(list_words), reverse=False)
+    best = matutils.argsort(dists, topn=topn + len(list_words), reverse=True)
     # ignore (don't return) words from the input
     result = [(model.index2word[sim], float(dists[sim])) for sim in best if model.index2word[sim] not in list_words]
 
@@ -144,7 +144,7 @@ def evaluate_file(filePath, topN, outputFile):
 if __name__ == '__main__':
 
     parser = optparse.OptionParser(usage="%prog [OPTIONS]")
-    parser.add_option('-m', '--model', default='vector.txt',
+    parser.add_option('-m', '--model', default='./models/vectors_cz_cbow_dim300_w10_phrase.txt',
 
                       help='Give a path with the name of a model to load (default name= vector.txt)')
     parser.add_option('-c', '--corpus', default='./corpus/czech_emb_corpus.txt',
@@ -154,7 +154,7 @@ if __name__ == '__main__':
     options, args = parser.parse_args()
 
     model = Word2Vec.load_word2vec_format(options.model,binary=False)
-    evaluate_file(options.corpus,options.topn, options.model)
+    evaluate_file(options.corpus,int(options.topn), options.model)
 
 
 
