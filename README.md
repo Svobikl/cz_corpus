@@ -14,7 +14,7 @@ for the research community.
 
 ### Note
 
-Results in an article are lower due to the fact that we have used dataset of phrases with default W2V settings, that is not suited for less amount of data as the Czech Wikipedia has. 
+Results in an article are lower due to the fact that we have used dataset trained with phrases and default W2V settings, that is not suited for less amount of data as the Czech Wikipedia has. Result was a dataset with lower single word performance, see our other publications that correct our results.
 
 For testing the words analogies only, please use no_phrase dataset. 
 
