@@ -1,5 +1,41 @@
 # cz_corpus
 
+The word embedding methods have been proven to be very
+useful in many tasks of NLP (Natural Language Processing). Much has
+been investigated about word embeddings of English words and phrases,
+but only little attention has been dedicated to other languages.
+Our goal in this paper is to explore the behavior of state-of-the-art
+word embedding methods on Czech, the language that is characterized
+by very rich morphology. We introduce new corpus for word analogy
+task that inspects syntactic, morphosyntactic and semantic properties
+of Czech words and phrases. We experiment with Word2Vec and GloVe
+algorithms and discuss the results on this corpus. The corpus is available
+for the research community.
+
+### Note
+
+Results in an article are lower due to the fact that we have used dataset of phrases with default W2V settings, that is not suited for less amount of data as the Czech Wikipedia has. 
+
+For testing the words analogies only, please use no_phrase dataset. 
+
+### Cite
+please cite this article: 
+```
+@inproceedings{svoboda:16,
+author = {Svoboda, Lukáš and Brychcín, Tomáš},
+year = {2016},
+month = {04},
+pages = {103–114},
+booktitle = {Computational Linguistics and Intelligent Text Processing},
+publisher={Springer},
+doi= {10.1007/978-3-319-75477-2},
+title = {New word analogy corpus for exploring embeddings of Czech words}
+}
+```
+
+
+### Testing corpus with Python and Gensim
+
 Prerequisites: 
 
 - Python >2.7
