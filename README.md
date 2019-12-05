@@ -33,6 +33,10 @@ title = {New word analogy corpus for exploring embeddings of Czech words}
 }
 ```
 
+check our other articles that correct the results and cite them if you like the ideas and want to continue with related research topics
+```
+https://scholar.google.com/citations?user=QItlY7oAAAAJ&hl=cs&oi=ao
+```
 
 ### Testing corpus with Python and Gensim
 
